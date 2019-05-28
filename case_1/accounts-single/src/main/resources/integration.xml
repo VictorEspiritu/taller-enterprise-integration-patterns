@@ -19,6 +19,6 @@
     <int:service-activator ref="executeTransaction"
                            method="execute" input-channel="localNewTransaction" output-channel="newTransaction" />
 
-    <bean id="executeTransaction" class="io.esev.ninja.accountssingle.service.Transaction" />
+    <bean id="executeTransaction" class="io.esev.ninja.accountssingle.service.TransactionService" />
 
 </beans>
