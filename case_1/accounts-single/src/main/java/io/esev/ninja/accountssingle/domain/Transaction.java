@@ -5,6 +5,7 @@ import java.util.UUID;
 public class Transaction {
 
     private String id;
+    private String customerId;
     private String accountSource;
     private String accountTarget;
     private double amount;
@@ -13,9 +14,9 @@ public class Transaction {
         super();
     }
 
-    public Transaction(String accountSource, String accountTarget, double amount) {
-        super();
+    public Transaction(String customerId, String accountSource, String accountTarget, double amount) {
         this.setId(UUID.randomUUID().toString());
+        this.setCustomerId(customerId);
         this.setAccountSource(accountSource);
         this.setAccountTarget(accountTarget);
         this.setAmount(amount);
@@ -27,6 +28,14 @@ public class Transaction {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     public String getAccountSource() {
@@ -57,6 +66,7 @@ public class Transaction {
     public String toString() {
         final StringBuilder sb = new StringBuilder("Transaction{");
         sb.append("id='").append(id).append('\'');
+        sb.append(", customerId='").append(customerId).append('\'');
         sb.append(", accountSource='").append(accountSource).append('\'');
         sb.append(", accountTarget='").append(accountTarget).append('\'');
         sb.append(", amount=").append(amount);

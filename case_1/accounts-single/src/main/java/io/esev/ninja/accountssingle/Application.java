@@ -2,6 +2,8 @@ package io.esev.ninja.accountssingle;
 
 import io.esev.ninja.accountssingle.domain.Account;
 import io.esev.ninja.accountssingle.domain.Transaction;
+import io.esev.ninja.accountssingle.service.AccountService;
+import io.esev.ninja.accountssingle.service.CustomerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,12 @@ public class Application {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
 	@Autowired
+	private AccountService accountService;
+
+	@Autowired
+	private CustomerService customerService;
+
+	@Autowired
 	@Qualifier("inTransaction")
 	private MessageChannel inputChannel;
 
@@ -39,15 +47,14 @@ public class Application {
 
 		return args -> {
 
-			inputChannel.send(new GenericMessage<>(new Transaction("011-1223-23432432-34", "011-3232-3556577567-23", 1230.5)));
-			inputChannel.send(new GenericMessage<>(new Transaction("011-5435-87687687-32", "011-7657-7808786433-76", 200)));
+			inputChannel.send(new GenericMessage<>(new Transaction("1","011-0760-0200374154", "011-0760-0564423422", 1230.5)));
+			inputChannel.send(new GenericMessage<>(new Transaction("2","011-0199-0345345455", "011-0199-0766565454", 200)));
 
 			Object result = ((PollableChannel) outputChannel).receive().getPayload();
 			Object result1 = ((PollableChannel) outputChannel).receive().getPayload();
 
 			LOGGER.info("Resultado: {}", result);
 			LOGGER.info("Resultado: {}", result1);
-
 		};
 	}
 
