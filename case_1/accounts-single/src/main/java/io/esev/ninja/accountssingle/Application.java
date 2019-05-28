@@ -23,11 +23,11 @@ public class Application {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
 	@Autowired
-	@Qualifier("localNewTransaction")
+	@Qualifier("inTransaction")
 	private MessageChannel inputChannel;
 
 	@Autowired
-	@Qualifier("newTransaction")
+	@Qualifier("outTransaction")
 	private PollableChannel outputChannel;
 
 	public static void main(String[] args) {
@@ -38,8 +38,6 @@ public class Application {
 	public CommandLineRunner run(ApplicationContext context) {
 
 		return args -> {
-			inputChannel = context.getBean("localNewTransaction", MessageChannel.class);
-			outputChannel = context.getBean("newTransaction", PollableChannel.class);
 
 			inputChannel.send(new GenericMessage<>(new Transaction("011-1223-23432432-34", "011-3232-3556577567-23", 1230.5)));
 			inputChannel.send(new GenericMessage<>(new Transaction("011-5435-87687687-32", "011-7657-7808786433-76", 200)));

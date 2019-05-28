@@ -9,15 +9,15 @@
     http://www.springframework.org/schema/integration/spring-integration.xsd">
 
     <!-- Input Local Channel -->
-    <int:channel id="localNewTransaction" />
+    <int:channel id="inTransaction" />
     <!-- Output Local Channel -->
-    <int:channel id="newTransaction">
+    <int:channel id="outTransaction">
         <int:queue capacity="10"/>
     </int:channel>
 
     <!-- Operation -->
     <int:service-activator ref="executeTransaction"
-                           method="execute" input-channel="localNewTransaction" output-channel="newTransaction" />
+                           method="execute" input-channel="inTransaction" output-channel="outTransaction" />
 
     <bean id="executeTransaction" class="io.esev.ninja.accountssingle.service.TransactionService" />
 
