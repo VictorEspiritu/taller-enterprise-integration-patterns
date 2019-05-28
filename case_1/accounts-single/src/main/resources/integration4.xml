@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <!-- Input Local Channel -->
+    <int:publish-subscribe-channel id="inTransaction" />
+    <!-- Output Local Channel -->
+    <int:channel id="outTransaction" />
+    <int:channel id="processTransaction" />
+    <int:publish-subscribe-channel id="validTransactionChannel" />
+    <int:channel id="invalidTransactionChannel" />
+
+    <int:channel id="endValidTransactionChannel">
+        <int:queue capacity="10"/>
+    </int:channel>
+    <int:channel id="endInvalidTransactionChannel">
+        <int:queue capacity="10"/>
+    </int:channel>
+
+    <!-- Validate Customer -->
+    <int:service-activator ref="customerServiceValidate" method="validateAccountOwn" input-channel="inTransaction" output-channel="outTransaction" />
+    <!-- Validate Account -->
+    <int:service-activator ref="accountServiceValidate" method="validateBalance" input-channel="inTransaction" output-channel="outTransaction" />
+
+    <!-- Aggregator -->
+    <int:aggregator id="transactionAggregator"
+                    input-channel="outTransaction"
+                    output-channel="processTransaction"
+                    correlation-strategy-expression="payload.id"
+                    release-strategy-expression="size() == 2"
+                    ref="executeTransaction" method="compositeTx">
+
+    </int:aggregator>
+
+    <int:recipient-list-router id="transactionRouter" input-channel="processTransaction">
+        <int:recipient channel="validTransactionChannel" selector-expression="payload.validTransaction() == true"/>
+        <int:recipient channel="invalidTransactionChannel" selector-expression="payload.validTransaction() == false" />
+    </int:recipient-list-router>
+
+    <!-- End InValidate Transaction -->
+    <int:service-activator ref="txErrorHandling" method="invalidTransaction" input-channel="invalidTransactionChannel" output-channel="endInvalidTransactionChannel" />
+
+
+    <!-- End Validate Transaction -->
+    <int:service-activator ref="executeTransaction" method="execute" input-channel="validTransactionChannel" output-channel="endValidTransactionChannel" />
+    <int:service-activator ref="sendNotification" method="sendNotification" input-channel="validTransactionChannel" output-channel="endValidTransactionChannel" />
+
+
+    <bean id="executeTransaction" class="io.esev.ninja.accountssingle.service.TransactionService" />
+    <bean id="customerServiceValidate" class="io.esev.ninja.accountssingle.service.CustomerService" />
+    <bean id="accountServiceValidate" class="io.esev.ninja.accountssingle.service.AccountService" />
+
+    <bean id="txErrorHandling" class="io.esev.ninja.accountssingle.service.ErrorHandling" />
+    <bean id="sendNotification" class="io.esev.ninja.accountssingle.service.NotificationManager" />
+
+
+</beans>

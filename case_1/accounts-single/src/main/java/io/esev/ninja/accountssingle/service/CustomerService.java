@@ -2,6 +2,8 @@ package io.esev.ninja.accountssingle.service;
 
 import io.esev.ninja.accountssingle.domain.Account;
 import io.esev.ninja.accountssingle.domain.Customer;
+import io.esev.ninja.accountssingle.domain.Transaction;
+import io.esev.ninja.accountssingle.domain.ValidateTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -33,8 +35,18 @@ public class CustomerService {
         return new ArrayList<>(customers.values());
     }
 
-    public Customer getCustomer(String id){
-        return customers.get(id);
+    public Customer getCustomer(String customerId){
+        return customers.get(customerId);
+    }
+
+    public ValidateTransaction validateAccountOwn(Transaction transaction){
+
+        LOGGER.info("*****************[1.2] Validate Account Own");
+        Customer customer = customers.get(transaction.getCustomerId());
+        ValidateTransaction validate = new ValidateTransaction(transaction);
+        validate.setValidateAccount(customer.getAccounts().stream().filter( a -> a.getAccount() == transaction.getAccountSource() ).findFirst().get() != null);
+
+        return validate;
     }
 
 }

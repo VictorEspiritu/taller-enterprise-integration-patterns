@@ -1,6 +1,8 @@
 package io.esev.ninja.accountssingle.service;
 
 import io.esev.ninja.accountssingle.domain.Account;
+import io.esev.ninja.accountssingle.domain.Transaction;
+import io.esev.ninja.accountssingle.domain.ValidateTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,5 +33,14 @@ public class AccountService {
 
     public List<Account> getAccount(){
         return new ArrayList<>(accounts.values());
+    }
+
+    public ValidateTransaction validateBalance(Transaction transaction){
+
+        LOGGER.info("*****************[1.1] Validate Mount");
+        ValidateTransaction validate = new ValidateTransaction(transaction);
+        validate.setValidateAmount(getAccount(transaction.getAccountSource()).getBalance() >= transaction.getAmount());
+
+        return validate;
     }
 }

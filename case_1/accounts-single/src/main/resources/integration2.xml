@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <!-- Input Local Channel -->
+    <int:publish-subscribe-channel id="inTransaction" />
+    <!-- Output Local Channel -->
+    <int:channel id="outTransaction" />
+    <int:channel id="processTransaction">
+        <int:queue capacity="10"/>
+    </int:channel>
+
+    <!-- Validate Customer -->
+    <int:service-activator ref="customerServiceValidate" method="validateAccountOwn" input-channel="inTransaction" output-channel="outTransaction" />
+    <!-- Validate Account -->
+    <int:service-activator ref="accountServiceValidate" method="validateBalance" input-channel="inTransaction" output-channel="outTransaction" />
+
+    <!-- Aggregator -->
+    <int:aggregator id="transactionAggregator"
+                    input-channel="outTransaction"
+                    output-channel="processTransaction"
+                    correlation-strategy-expression="payload.id"
+                    release-strategy-expression="size() == 2">
+
+    </int:aggregator>
+
+    <bean id="executeTransaction" class="io.esev.ninja.accountssingle.service.TransactionService" />
+    <bean id="customerServiceValidate" class="io.esev.ninja.accountssingle.service.CustomerService" />
+    <bean id="accountServiceValidate" class="io.esev.ninja.accountssingle.service.AccountService" />
+
+</beans>
