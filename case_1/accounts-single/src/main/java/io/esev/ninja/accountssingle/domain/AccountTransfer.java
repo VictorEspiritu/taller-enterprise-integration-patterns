@@ -2,7 +2,7 @@ package io.esev.ninja.accountssingle.domain;
 
 import java.util.UUID;
 
-public class Transaction {
+public class AccountTransfer {
 
     private String id;
     private String customerId;
@@ -10,11 +10,11 @@ public class Transaction {
     private String accountTarget;
     private double amount;
 
-    public Transaction() {
+    public AccountTransfer() {
         super();
     }
 
-    public Transaction(String customerId, String accountSource, String accountTarget, double amount) {
+    public AccountTransfer(String customerId, String accountSource, String accountTarget, double amount) {
         this.setId(UUID.randomUUID().toString());
         this.setCustomerId(customerId);
         this.setAccountSource(accountSource);
